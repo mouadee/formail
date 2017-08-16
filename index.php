@@ -1,3 +1,11 @@
+<?php
+session_start();
+require 'libs/phpmailer/PHPMailerAutoload.php';
+require 'libs/phpmailer/class.phpmailer.php';
+require 'libs/phpmailer/class.pop3.php';
+require 'libs/phpmailer/class.smtp.php';
+?>
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -50,12 +58,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // if (empty($formErrors)) {
     //   $risala = mail ($to, $subject, $body, $from;
 
-      if ($_POST['button']) {
-         if (mail ($to, $subject, $body, $from)) {
-             echo '<p>Your message has been sent!</p>';
-         } else {
-             echo '<p>Something went wrong, go back and try again!</p>';
-         }
+      if (empty($formErrors)) {
+
+        $m = new PHPMailer;
+        //$m->isSMTP();
+        $m->SMTPAuth = true;
+        $m->Host = 'smtp.gmail.com';
+        $m->Username = 'elazzaouimouade@gmail.com';
+        $m->Password = 'entrerprise7260726012000';
+        $m->SMTPSecure = 'tls';
+        $m->Port = 465;
+        $m->isHTML(true);
+
+        $m->Subject = 'Here is the subject';
+        $m->Body    = $message;
+        $m->setFrom('Mouade');
+        $m->addAddress('elazzaouimouade@gmail.com', 'elazzaoui');
+        if(!$m->send()) {
+          echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          Message could not be sent !
+          </div>';
+          echo 'Mailer Error: ' . $m->ErrorInfo;
+        } else {
+          echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          Message has been sent !
+          </div>';
+        }
+
       }
 
     //}
@@ -88,6 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <button class="btn btn-success send" type="submit" name="button">Send</button>
       </form>
     </div>
+
 
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
